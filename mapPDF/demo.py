@@ -5,9 +5,10 @@ import pandas as pd
 
 def load_chi(lib_dir):
     """method to load chi files from lib_dir"""
-    chi_fn_list = sorted([f for f in os.listdir(lib_dir) if f.endswith('.chi')])
-    chi_array = []
-    Q_array = []
+    chi_fn_list = sorted([f for f in os.listdir(lib_dir) if\
+                          f.endswith('.chi')])
+    Iq_list = []
+    Q_list = []
     for chi in chi_fn_list:
         fn = os.path.join(lib_dir, chi)
         try:
@@ -15,17 +16,10 @@ def load_chi(lib_dir):
         except:
             array = np.loadtxt(fn, skiprows=4).T # fit2D
         Q, Iq = array
-        chi_array.append(Iq)
-        Q_array.append(Q)
-    chi_array = np.asarray(chi_array)
-    Q_array = np.asarray(Q_array)
-    chi_dim = chi_array.shape
-    Q_dim = Q_array.shape
-    # just to reproduce, dont have to save q for each of raw
-    print("INFO: load {} by {} array"
-          .format(Q_array.shape, chi_array.shape))
-    return chi_fn_list, Q_array, chi_array
+        Iq_list.append(Iq)
+        Q_list.append(Q)
 
+    return chi_fn_list, Q_list, Iq_list
 
 # lookup table
 _df = pd.read_csv('example/EO75A_soh_1_21_17_morning.txt')
@@ -40,5 +34,5 @@ lib_dir = 'example/fit2d_raster/'
 Iq_name_list, Q_list, Iq_list = load_chi(lib_dir)
 
 df['basename'] = pd.Series(Iq_name_list)
-#Iq_df = pd.DataFrame(Iq_list)
-#df['Q'] = pd.Series(Q_list)
+df['Iq'] = pd.DataFrame.from_dict(dict(Iq=Iq_list))
+df['q'] = pd.DataFrame.from_dict(dict(q=Q_list))
