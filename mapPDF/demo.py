@@ -5,7 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
-
 from diffpy.pdfgetx.pdfgetter import PDFGetter
 from diffpy.pdfgetx.pdfconfig import PDFConfig
 
@@ -99,21 +98,21 @@ def Gr_transform(q_grid, Iq_array, composition_info, config_dict):
 
     return r, Gr_array
 
+#### mapPDF working example ####
 
-# lookup table
+
+# load lookup table
 _df = pd.read_csv('example/EO75A_soh_1_21_17_morning.txt')
 
 # optional; to exclude function
-exclude_col = ['#number', 'time', 'pe1_stats1_total',
-               'diff_x_user_setpoint', 'diff_y_user_setpoint',
-               'pe1_image']
-colum_mask = [col for col in _df.columns if col not in exclude_col]
-df = _df[colum_mask].copy()  # the main df to work on
+qoi_colmns  = ['#number', 'time', 'diff_x', 'diff_y']
+df = _df[qoi_colmns].copy()  # the main df to work on
 
 # list of file name
 lib_dir = 'example/fit2d_raster/'
 chi_name_list, Q_array, Iq_array = load_chi(lib_dir)
-df['basename'] = pd.Series(chi_name_list)
+df['chi_file_name'] = pd.Series(chi_name_list)
+# TODO: turn this into h5py. array + metadata
 
 # load real background
 _bkg = np.loadtxt('example/background_W151005_ct_300_13f4d2.chi',
@@ -128,7 +127,7 @@ sub_Iq = bkg_subtraction(Q_array, Iq_array, bkg_q, bkg_Iq)
 # transform Gr
 composition_info = ['CPtCu']*len(df)   # dummy for test
 qmin, qmax, qmaxinst, rmin, rmax,\
-        rstep, rpoly = (0.1, 25., 25, 0., 100., 0.01, 0.99)
+        rstep, rpoly = (0.1, 25., 25, 0., 100., 0.01, 0.90)
 
 config_dict = dict(dataformat='Qnm', mode='xray', qmaxinst=qmaxinst,
                    qmin=qmin, qmax=qmax, rmax=rmax, rmin=rmin,
