@@ -1,4 +1,4 @@
-**Added:** demo of mappdf scan (alpha test)
+**Added:** None
 
 **Changed:** None
 
