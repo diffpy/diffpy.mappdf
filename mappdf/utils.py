@@ -97,6 +97,13 @@ def Gr_transform(q_grid, Iq_array, composition_info, config_dict):
 
     return r, Gr_array
 
+def conf_label_size(ax, label_size):
+    ax.xaxis.label.set_size(label_size)
+    ax.yaxis.label.set_size(label_size)
 
-def magic():
-    pass
+
+def conf_tick_size(ax, tick_size):
+    for tick in ax.xaxis.get_major_ticks():
+                tick.label.set_fontsize(tick_size)
+    for tick in ax.yaxis.get_major_ticks():
+                tick.label.set_fontsize(tick_size)
