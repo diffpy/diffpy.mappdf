@@ -69,3 +69,6 @@ target/
 
 # sphinx doc
 docs/
+
+# ipython notebook
+.ipynb_checkpoints
