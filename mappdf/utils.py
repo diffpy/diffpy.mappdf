@@ -1,4 +1,4 @@
-"""module to provide helper functions needed for mapPDF"""
+"""module to provide helper functions needed for mappdf"""
 import os
 import numpy as np
 import pandas as pd

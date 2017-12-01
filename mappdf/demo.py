@@ -8,7 +8,7 @@ from scipy.stats import pearsonr
 #FIXME correct import later
 from utils import *
 
-#### mapPDF working example ####
+#### mappdf working example ####
 
 # load lookup table
 _df =pd.read_csv('map_PDF_example_data/meta/20161115-220716_grid_scan_md.txt')
