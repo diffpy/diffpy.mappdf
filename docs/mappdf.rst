@@ -20,10 +20,10 @@ mappdf\.glbl module
     :undoc-members:
     :show-inheritance:
 
-mappdf\.mapPDF module
+mappdf\.mappdf module
 ---------------------
 
-.. automodule:: mappdf.mapPDF
+.. automodule:: mappdf.mappdf
     :members:
     :undoc-members:
     :show-inheritance:
