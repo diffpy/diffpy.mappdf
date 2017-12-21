@@ -4,10 +4,52 @@ import scipy
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-import seaborn.apionly as sns
+from scipy.stats import pearsonr
+# import seaborn.apionly as sns
 
 from diffpy.pdfgetx.pdfgetter import PDFGetter
 from diffpy.pdfgetx.pdfconfig import PDFConfig
+
+
+def process_chi_df(df, compositions, pdf_parameters,
+                   background=None, iq_pearson_data=None,
+                   gr_pearson_data=None):
+    if iq_pearson_data is not None:
+        df['iq_pearson'] = [pearsonr(i, iq_pearson_data)[0] for i in df['iq']]
+    pdfgetter = PDFGetter()
+    if background is not None:
+        df['corrected_iq'] = df['iq'] - background
+        df['gr'] = [pdfgetter(q, iq, composition=comp, **pdf_parameters)[1]
+                    for q, iq, comp in zip(df['q'], df['corrected_iq'], compositions)]
+    else:
+        df['gr'] = [pdfgetter(q, iq, composition=comp, **pdf_parameters)[1]
+                    for q, iq, comp in
+                    zip(df['q'], df['iq'], compositions)]
+    if gr_pearson_data is not None:
+        df['gr_pearson'] = [pearsonr(i, gr_pearson_data)[0] for i in
+                            df['gr']]
+
+
+def mappdf_load_chi(csv_file, qoi_columns=None, root=''):
+    raw_df = pd.read_csv(csv_file)
+    if qoi_columns:
+        df = raw_df[qoi_columns].copy()
+    else:
+        df = raw_df.copy()
+    qs = []
+    iqs = []
+    for fn in df['filename']:
+        fn = os.path.join(root, fn)
+        try:
+            q, iq = np.loadtxt(fn).T
+        # TODO: limit scope
+        except:
+            q, iq = np.loadtxt(fn, skiprows=4).T
+        qs.append(q)
+        iqs.append(iq)
+    df['q'] = qs
+    df['iq'] = iqs
+    return df
 
 
 def load_chi(lib_dir):
@@ -113,49 +155,49 @@ def conf_tick_size(ax, tick_size):
         tick.label.set_fontsize(tick_size)
 
 
-def bSeabornStyle(ticks=False, cycle='simon', context='notebook', f_scale=1,
-                  a_scale=1,
-                  l_width=1, m_size=1, xt_col='black'):
-    sns.reset_orig()
-    if ticks == False:
-        sns.set_style("whitegrid")
-    else:
-        sns.set_style("ticks")
-
-    sns.set_style({
-        'grid.linestyle': '--',
-        'grid.color': 'b2b2b2',
-        'axes.linewidth': (a_scale * 1.75),
-        'axes.labelcolor': 'black',
-        'axes.edgecolor': 'black',
-        'xtick.color': xt_col,
-        'ytick.color': 'black',
-        'xtick.direction': 'in',
-        'ytick.direction': 'in',
-    })
-
-    sns.set_context(context, font_scale=(f_scale * 1.5),
-                    rc={"lines.linewidth": (l_width * 2),
-                        "lines.markersize": (m_size * 5), })
-    mpl.rcParams['font.family'] = 'Arial'
-    mpl.rcParams['mathtext.fontset'] = 'stixsans'
-    mpl.rcParams['font.size'] = 18
-    mpl.rcParams['figure.dpi'] = 150
-    mpl.rcParams['figure.figsize'] = 9, 6
-    mpl.rcParams['grid.linewidth'] = 0.5
-    mpl.rcParams['savefig.bbox'] = 'tight'
-
-    if cycle == 'simon':
-        simonCycle = ["#0B3C5D", "#062F4F", "#328CC1", "#D9B310", "#984B43",
-                      "#B82601",
-                      "#57652A", "#76323F", "#626E60", "#AB987A", "#C09F80",
-                      "#b0b0b0ff"]
-        sns.set_palette(simonCycle)
-    elif cycle == 'simon2':
-        simonCycle2 = ["#0B3C5D", "#B82601", "#1c6b0a", "#328CC1", "#062F4F",
-                       "#D9B310", "#984B43",
-                       "#76323F", "#626E60", "#AB987A", "#C09F80", "#b0b0b0ff"]
-        sns.set_palette(simonCycle2)
-    else:
-        # Use another SNS preset: deep, muted, bright, pastel, dark, colorblind
-        sns.set_palette(cycle)
+# def bSeabornStyle(ticks=False, cycle='simon', context='notebook', f_scale=1,
+#                   a_scale=1,
+#                   l_width=1, m_size=1, xt_col='black'):
+#     sns.reset_orig()
+#     if ticks == False:
+#         sns.set_style("whitegrid")
+#     else:
+#         sns.set_style("ticks")
+#
+#     sns.set_style({
+#         'grid.linestyle': '--',
+#         'grid.color': 'b2b2b2',
+#         'axes.linewidth': (a_scale * 1.75),
+#         'axes.labelcolor': 'black',
+#         'axes.edgecolor': 'black',
+#         'xtick.color': xt_col,
+#         'ytick.color': 'black',
+#         'xtick.direction': 'in',
+#         'ytick.direction': 'in',
+#     })
+#
+#     sns.set_context(context, font_scale=(f_scale * 1.5),
+#                     rc={"lines.linewidth": (l_width * 2),
+#                         "lines.markersize": (m_size * 5), })
+#     mpl.rcParams['font.family'] = 'Arial'
+#     mpl.rcParams['mathtext.fontset'] = 'stixsans'
+#     mpl.rcParams['font.size'] = 18
+#     mpl.rcParams['figure.dpi'] = 150
+#     mpl.rcParams['figure.figsize'] = 9, 6
+#     mpl.rcParams['grid.linewidth'] = 0.5
+#     mpl.rcParams['savefig.bbox'] = 'tight'
+#
+#     if cycle == 'simon':
+#         simonCycle = ["#0B3C5D", "#062F4F", "#328CC1", "#D9B310", "#984B43",
+#                       "#B82601",
+#                       "#57652A", "#76323F", "#626E60", "#AB987A", "#C09F80",
+#                       "#b0b0b0ff"]
+#         sns.set_palette(simonCycle)
+#     elif cycle == 'simon2':
+#         simonCycle2 = ["#0B3C5D", "#B82601", "#1c6b0a", "#328CC1", "#062F4F",
+#                        "#D9B310", "#984B43",
+#                        "#76323F", "#626E60", "#AB987A", "#C09F80", "#b0b0b0ff"]
+#         sns.set_palette(simonCycle2)
+#     else:
+#         # Use another SNS preset: deep, muted, bright, pastel, dark, colorblind
+#         sns.set_palette(cycle)
