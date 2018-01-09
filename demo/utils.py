@@ -5,26 +5,42 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 from scipy.stats import pearsonr
-import seaborn.apionly as sns
+# import seaborn.apionly as sns
 
 from diffpy.pdfgetx.pdfgetter import PDFGetter
 from diffpy.pdfgetx.pdfconfig import PDFConfig
 
 
-def process_chi_df(df, compositions, pdf_parameters,
+def process_chi_df(df, pdf_parameters,
                    background=None, iq_pearson_data=None,
                    gr_pearson_data=None):
+    if isinstance(iq_pearson_data, int):
+        iq_pearson_data = df['iq'][iq_pearson_data]
     if iq_pearson_data is not None:
         df['iq_pearson'] = [pearsonr(i, iq_pearson_data)[0] for i in df['iq']]
+
     pdfgetter = PDFGetter()
-    if background is not None:
+    _background = background
+    if isinstance(background, int):
+        _background = df['iq'][background]
+    if _background is not None:
         df['corrected_iq'] = df['iq'] - background
         df['gr'] = [pdfgetter(q, iq, composition=comp, **pdf_parameters)[1]
-                    for q, iq, comp in zip(df['q'], df['corrected_iq'], compositions)]
+                    for q, iq, comp in zip(df['q'], df['corrected_iq'],
+                                           df['composition'])]
+        # don't do bg subs on bg
+        if isinstance(background, int):
+            df['gr'][background] = pdfgetter(df['q'][background],
+                                             df['iq'][background],
+                                             composition=df['composition'][background],
+                                              **pdf_parameters)[1]
     else:
         df['gr'] = [pdfgetter(q, iq, composition=comp, **pdf_parameters)[1]
                     for q, iq, comp in
-                    zip(df['q'], df['iq'], compositions)]
+                    zip(df['q'], df['iq'], df['composition'])]
+    if isinstance(gr_pearson_data, int):
+        gr_pearson_data = df['gr'][gr_pearson_data]
+        print(np.sum(gr_pearson_data))
     if gr_pearson_data is not None:
         df['gr_pearson'] = [pearsonr(i, gr_pearson_data)[0] for i in
                             df['gr']]
