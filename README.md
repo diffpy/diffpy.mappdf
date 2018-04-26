@@ -1,8 +1,28 @@
-# Map PDF protocol demo
+#mapPDF overview
 
-mapPDF is a set of software scripts for automating the collection of large numbers of x-ray datasets in a high-throughput experiment. Please see the Readme below for how to use it.
+mapPDF is a set of software scripts for automating the collection of large numbers of x-ray datasets in a high-throughput experiment.
+
+## Getting started
+
+We assume that you have collected/are about to collect some diffraction for PDF analysis from a high throughut experiment such as from a synchrotron experiment.
+
+By downloading and running mapPDF scripts you can organize and visualize your large dataset.
+You can download the zip file by clicking on the green button or clone the git repository.
+When you've extracted the distibution navigate to the demo folder.
+It contains two files: mappdf_utils.py and mapPDF_demo.ipynb jupyter notebook.
+You will work with mapPDF_demo.ipynb and should not change the mappdf_utils.py file, though a copy of this file should be present in the directory as the demo notebook.
+
+Start by opening the mapPDF_demo.ipynb.
+To do this you need to have Jupyter Notebook installed and working, which you can get at http://jupyter.org/install
+The mapPDF notebook is using Python 3.
+
+To run the demo type `jupyter notebook` on the command line then navigate to the folder where the mapPDF_demo.ipynb file is and click on it.
+
+Then follow the instructions in the notebook.
 
 This demo is intended to show the capability and general workflow of the mapPDF protocol as described in [insert link to paper]. It is intended as a quick start soution for a novel python user who doesnt want to create a similar solution from scratch.
+
+For questions and help with mapPDF post questions at https://groups.google.com/forum/#!forum/diffpy-users
 
 ## Introduction:
 
@@ -13,34 +33,11 @@ The demo provides an example of a typical workflow, shows how to create and prov
 
 The current implementation is aimed at users of the XPD beamline at NSLSII but can be readily extended to other sources by the user through it's transparent structure and use of easily available python packages.
 
-### Overall workflow:
-
-1. Set up the paths to metadata and images / data files.
-2. Load the data into a "collection" dataframe including that information.
-3. Transform data to PDF
-4. Use pearsonr to screen the dataset.
-5. Apply a fit recipe and save refined parameters
-6. Visualize refined parameters.
-7. Adjust/improve model
-
-It was designed to work with output files from the XPD beamline at NSLSII.
-Output from other instruments can be used given the general metadata format is the same, or if the user is willing to adjust the import script. Once set up, the protocol is intended to work with minimal adjustments between the experiments.
-
-### Requirements:
-
+## Requirements:
 For this to run you will need:
 
-Python3 (f.x. Anaconda Python) with following packages: 
-numpy, pandas, matplotlib, scipy
+Python3 (e.g., Anaconda Python) with following packages: numpy, pandas, matplotlib, scipy
 
-You would also need PDFGetX. The guidelines on how to obtain it can be found on diffpy.org
+You would also need the pdfGetX3 package installed (http://www.diffpy.org/products/pdfgetx3.html).
 
-The custom functions used for diffpy.mappdf are found in 'mappdf_utils.py' which is downloaded together with the demo.
 
-### Installation:
-
-Make sure you have all the required packages installed into your python environment and have downloaded the demo folder containing 'mappdf_utils.py' together with the data files required for the demo located in 'example_data' folder.
-
-### Use instructions:
-
-Follow the workflow in the demo example and make necessary changes to suit your problem.
