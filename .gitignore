@@ -69,3 +69,6 @@ target/
 
 # sphinx doc
 docs/
+
+# jupyter notebook check point
+*.ipynb
